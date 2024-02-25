@@ -1,0 +1,48 @@
+syntax = "proto3";
+package notary.proto;
+
+message User {
+    uint64 id               = 1;
+    string given_name       = 2;
+    string family_name      = 3;
+    string picture          = 4;
+    string email            = 5;
+    uint64 created_at       = 6;
+}
+
+message Authority {
+    string service = 1;
+    string key = 2;
+}
+
+enum Oauth2Provider {
+    google = 0;
+}
+
+message GoogleOauth2AuthPageReq {
+    Authority authority = 1;
+    Oauth2Provider provider = 2;
+
+    string callback = 3;
+}
+
+message OauthPage {
+    string url = 1;
+}
+
+message GetUserReq {
+    Authority authoriy = 1;
+    Oauth2Provider provider = 2;
+
+    string notary_token = 3;
+}
+
+message NotaryToken {
+    string jwt = 1;
+    User user = 2;
+}
+
+service OAuth2 {
+    rpc get_oauth2_page(GoogleOauth2AuthPageReq) returns (OauthPage);
+    rpc get_user(GetUserReq) returns (User);
+}

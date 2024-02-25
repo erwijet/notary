@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notary</title>
+
+    <script>
+      function checkToken(tok, cb) {
+        fetch(
+          `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${tok}`
+        )
+          .then((res) => res.json())
+          .then((body) => cb("azp" in body));
+      }
+
+      const params = new URLSearchParams(window.location.hash.slice(1));
+
+      const state = params.get("state");
+      const token = params.get("access_token");
+
+      checkToken(token, (isValid) => {
+        if (!isValid) {
+          alert("invalid token");
+          return;
+        }
+
+        window.location.href = `http://localhost:8080/handle/${state}/${token}`
+      });
+    </script>
+  </head>
+  <body>
+    Loading...
+  </body>
+</html>
