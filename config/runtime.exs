@@ -10,8 +10,6 @@ config :notary, Notary.Repo,
   hostname: env!("POSTGRES_HOSTNAME", :string!),
   port: env!("POSTGRES_PORT", :integer!)
 
-config :notary, ecto_repos: [Notary.Repo]
-
 ##
 
 config :notary,
