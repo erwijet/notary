@@ -16,13 +16,7 @@ RUN rm pnpm-lock.yaml \
 FROM docker.io/hexpm/elixir:1.15.7-erlang-24.3.4.16-ubuntu-focal-20240123
 WORKDIR /app
 
-RUN PROTOC_ZIP=protoc-3.20.3-linux-aarch_64.zip \
-    && apt-get update \
-    && apt-get install -y curl unzip \
-    && curl -OL "https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/$PROTOC_ZIP" \
-    && unzip -o "$PROTOC_ZIP" -d /usr/local bin/protoc \
-    && unzip -o "$PROTOC_ZIP" -d /usr/local 'include/*' \
-    && rm -f $PROTOC_ZIP
+RUN apt-get update && apt-get install -y protobuf-compiler
 
 COPY mix.exs    /app
 COPY mix.lock   /app
@@ -38,4 +32,4 @@ RUN mix escript.install hex protobuf --force
 RUN PATH=~/.mix/escripts:$PATH protoc --elixir_out=plugins=grpc:./lib/ protos/notary.proto
 RUN MIX_ENV=prod mix release
 
-CMD "mix ecto.migrate && _build/prod/rel/notary/bin/notary start"
+CMD ["/app/_build/prod/rel/notary/bin/notary", "start"]
