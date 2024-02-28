@@ -1,6 +1,8 @@
 defmodule Notary.Portal.Router do
   use Plug.Router
 
+  import Notary.Helpers
+
   plug(:match)
 
   plug(Plug.Parsers,
@@ -17,12 +19,8 @@ defmodule Notary.Portal.Router do
 
       case passkey do
         ^expected_key ->
-          conn
-          |> send_resp(
-            200,
-            %{"token" => Notary.Portal.Token.generate_and_sign!()} |> Jason.encode!()
-          )
-
+          token = Notary.Portal.Token.generate_and_sign!()
+          conn |> send_json(%{"token" => token})
         _ ->
           conn |> send_resp(422, "invalid")
       end
@@ -49,13 +47,13 @@ defmodule Notary.Portal.Router do
 
     get "/clients" do
       clients = Notary.Repo.all(Notary.Client)
-      conn |> send_resp(200, %{"clients" => clients} |> Jason.encode!())
+      conn |> send_json(%{ "clients" => clients })
     end
 
     get "/clients/:id" do
       with {id, _} <- Integer.parse(id),
            client when not is_nil(client) <- Notary.Repo.get(Notary.Client, id) do
-        conn |> send_resp(200, client |> Jason.encode!())
+        conn |> send_json(client)
       else
         _ -> conn |> send_resp(404, "not found")
       end
@@ -66,7 +64,7 @@ defmodule Notary.Portal.Router do
 
       if proposed.valid? do
         case Notary.Repo.insert(proposed) do
-          {:ok, inserted} -> conn |> send_resp(201, inserted |> Jason.encode!())
+          {:ok, inserted} -> conn |> send_json(inserted, code: 201)
           _ -> conn |> send_resp(409, "conflict")
         end
       else
@@ -78,7 +76,7 @@ defmodule Notary.Portal.Router do
       with {id, _} <- Integer.parse(id),
            base when not is_nil(base) <- Notary.Repo.get(Notary.Client, id) do
         case Notary.Client.changeset(base, conn.body_params) |> Notary.Repo.update() do
-          {:ok, updated} -> conn |> send_resp(200, updated |> Jason.encode!())
+          {:ok, updated} -> conn |> send_json(updated)
           _ -> conn |> send_resp(409, "conflict")
         end
       else
@@ -90,7 +88,7 @@ defmodule Notary.Portal.Router do
       with {id, _} <- Integer.parse(id),
            staged when not is_nil(staged) <- Notary.Repo.get(Notary.Client, id) do
         {:ok, deleted} = Notary.Repo.delete(staged)
-        conn |> send_resp(200, deleted |> Jason.encode!())
+        conn |> send_json(deleted)
       else
         _ -> conn |> send_resp(404, "not found")
       end

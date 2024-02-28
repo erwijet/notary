@@ -1,7 +1,7 @@
 defmodule Notary.Router do
-  alias Notary.Registrar
   use Plug.Router
 
+  import Notary.Helpers
   import Ecto.Query, only: [from: 2]
 
   plug(:match)
@@ -35,12 +35,22 @@ defmodule Notary.Router do
             "https://accounts.google.com/o/oauth2/auth?client_id=#{client.google_oauth_client_id}&redirect_uri=#{Application.fetch_env!(:notary, :hostname)}/callbacks/google&scope=openid+email+profile&email&response_type=token&state=#{handle}"
         end
 
-      conn |> send_resp(200, %{"url" => url} |> Jason.encode!())
+      conn |> send_json(%{"url" => url})
     else
       issue ->
         issue |> IO.inspect()
         conn |> send_resp(400, "bad request")
     end
+  end
+
+  get "/inspect/:token" do
+    body =
+      case Notary.Token.verify_and_validate(token) do
+        {:ok, claims} -> %{"valid" => true, "claims" => claims}
+        {:error, reason} -> %{"valid" => false, "reason" => reason}
+      end
+
+    conn |> send_json(body)
   end
 
   get "/callbacks/google" do
