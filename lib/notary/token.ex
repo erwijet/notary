@@ -1,5 +1,4 @@
 defmodule Notary.Token do
-  alias Notary.Proto
   use Joken.Config
 
   @impl true
@@ -8,10 +7,10 @@ defmodule Notary.Token do
     |> add_claim("iss", fn -> "Notary" end, &(&1 == "Notary"))
   end
 
-  @spec issue_for_client(Notary.Client.t(), Proto.Oauth2Provider.t(), String.t()) ::
+  @spec issue_for_client(Notary.Client.t(), String.t(), String.t()) ::
           {:ok, Joken.bearer_token()} | {:error, Joken.error_reason() | Exception.t()}
   def issue_for_client(client, provider, oauth_tok) do
-    with {:ok, user} <- Notary.User.fetch(provider, oauth_tok),
+    with {:ok, user} <- Notary.User.fetch(provider |> String.to_atom(), oauth_tok),
          {:ok, token, _claims} <-
            generate_and_sign(%{
              "aud" => client.name,

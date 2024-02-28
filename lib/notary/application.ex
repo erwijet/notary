@@ -1,10 +1,3 @@
-defmodule Notary.Endpoint do
-  use GRPC.Endpoint
-
-  intercept(GRPC.Server.Interceptors.Logger)
-  run(Notary.Services.OAuth2.Server)
-end
-
 defmodule Notary.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
@@ -15,7 +8,6 @@ defmodule Notary.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {GRPC.Server.Supervisor, endpoint: Notary.Endpoint, port: 50052, start_server: true},
       {Plug.Cowboy, scheme: :http, plug: Notary.Router, options: [port: 8080]},
       Notary.Registrar,
       Notary.Archivist,

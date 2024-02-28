@@ -15,8 +15,7 @@ services:
     build:
       context: ./notary
     ports:
-      - 8080:8080 # portal/api endpoint
-      - 50052:50052 # GRPC server
+      - 8080:8080
     enviornment:
       POSTGRES_USERNAME: <username>
       POSTGRES_PASSWORD: <password>

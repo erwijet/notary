@@ -1,9 +1,12 @@
 defmodule Notary.Router do
+  alias Notary.Registrar
   use Plug.Router
+
+  import Ecto.Query, only: [from: 2]
 
   plug(:match)
 
-  plug(Plug.Static, at: "/assets", from: "./portal/build/assets", )
+  plug(Plug.Static, at: "/assets", from: "./portal/build/assets")
 
   plug(:dispatch)
 
@@ -11,6 +14,33 @@ defmodule Notary.Router do
 
   get "/" do
     conn |> send_file(200, "portal/build/index.html")
+  end
+
+  get "/authorize/:service" do
+    with %{"via" => provider, "key" => key, "callback" => callback} <-
+           conn |> fetch_query_params() |> Map.get(:query_params),
+         client when not is_nil(client) <-
+           Notary.Repo.all(from(c in Notary.Client, where: c.name == ^service and c.key == ^key))
+           |> List.first(),
+         true <- provider in ["google"] do
+      handle =
+        Notary.Registrar.issue(client,
+          via: provider,
+          callback: callback
+        )
+
+      url =
+        case provider do
+          "google" ->
+            "https://accounts.google.com/o/oauth2/auth?client_id=#{client.google_oauth_client_id}&redirect_uri=#{Application.fetch_env!(:notary, :hostname)}/callbacks/google&scope=openid+email+profile&email&response_type=token&state=#{handle}"
+        end
+
+      conn |> send_resp(200, %{"url" => url} |> Jason.encode!())
+    else
+      issue ->
+        issue |> IO.inspect()
+        conn |> send_resp(400, "bad request")
+    end
   end
 
   get "/callbacks/google" do
@@ -25,11 +55,11 @@ defmodule Notary.Router do
            {:issue_token,
             Notary.Token.issue_for_client(
               handle.for_client,
-              handle.initiator.provider,
+              handle.provider,
               oauth_token
             )} do
       conn
-      |> put_resp_header("location", "#{handle.initiator.callback}?token=#{token}")
+      |> put_resp_header("location", "#{handle.callback}?token=#{token}")
       |> send_resp(302, "")
     else
       {:lookup_handle, nil} ->
