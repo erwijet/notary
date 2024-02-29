@@ -1,6 +1,4 @@
 defmodule Notary.Registrar do
-  alias Notary.Proto.GoogleOauth2AuthPageReq
-
   use Agent
 
   defmodule CallbackHandle do

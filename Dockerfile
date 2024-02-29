@@ -16,20 +16,15 @@ RUN rm pnpm-lock.yaml \
 FROM docker.io/hexpm/elixir:1.15.7-erlang-24.3.4.16-ubuntu-focal-20240123
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y protobuf-compiler
-
 COPY mix.exs    /app
 COPY mix.lock   /app
-COPY ./protos   /app/protos
 COPY ./lib      /app/lib
 COPY ./config   /app/config
 COPY ./priv /app/priv
 
 COPY --from=build-portal /portal /app/portal
 
-RUN mix deps.get
-RUN mix escript.install hex protobuf --force
-RUN PATH=~/.mix/escripts:$PATH protoc --elixir_out=plugins=grpc:./lib/ protos/notary.proto
-RUN MIX_ENV=prod mix release
+RUN mix deps.get \
+    && MIX_ENV=prod mix release
 
 CMD ["/app/_build/prod/rel/notary/bin/notary", "start"]
