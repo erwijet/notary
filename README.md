@@ -67,3 +67,16 @@ services:
 For example, 
 
 Note that the docker image **does not apply database migrations**. To configure your database, run `docker compose exec notary /bin/sh` and then, once in the shell, run `$ mix ecto.migrate` to apply the migrations.
+
+## Module Quick Reference
+
+|Module|Description|
+|---|---|
+|[`Notary.Registrar`](lib/notary/registrar.ex)|[`Agent`](https://hexdocs.pm/elixir/1.12.3/Agent.html) which manages the state of all of the `CallbackHandle`s that are in-flight.|
+|[`Notary.Archivist`](lib/notary/archivist.ex)|[`GenServer`](https://hexdocs.pm/elixir/GenServer.html) which audits [`Notary.Registrar`](lib/notary/registrar.ex) on a regular interval and purges any expired handles|
+|[`Notary.Client`](lib/notary/client.ex)|An [`Ecto`](https://hexdocs.pm/typed_ecto_schema/TypedEctoSchema.html) schema representing the client object stored in postgres|
+|[`Notary.User`](lib/notary/user.ex)|The common struct to represent user data-- also handles fetching user data via oauth2 access tokens|
+|[`Notary.Token`](lib/notary/token.ex)|A [`Joken.Config`](https://hexdocs.pm/joken/Joken.Config.html) for handling JWT logic for notary-issued tokens for clients|
+|[`Notary.Router`](lib/notary/router.ex)|HTTP route handles for all core Notary RPCs|
+|[`Notary.Portal.Router`](lib/notary/portal/router.ex)|CRUD API for [`Client`](lib/notary/client.ex) objects|
+|[`Notary.Portal.Token`](lib/notary/portal/token.ex)|A [`Joken.Config`](https://hexdocs.pm/joken/Joken.Config.html) for handling authenticating `/portal/*` outes|
