@@ -29,10 +29,12 @@ defmodule Notary.Router do
           callback: callback
         )
 
+      redirect_uri = "#{conn.scheme |> Atom.to_string()}://#{conn.host}:#{conn.port |> to_string}"
+
       url =
         case provider do
           "google" ->
-            "https://accounts.google.com/o/oauth2/auth?client_id=#{client.google_oauth_client_id}&redirect_uri=#{client.notary_host}/callbacks/google&scope=openid+email+profile&email&response_type=token&state=#{handle}"
+            "https://accounts.google.com/o/oauth2/auth?client_id=#{client.google_oauth_client_id}&redirect_uri=#{redirect_uri}/callbacks/google&scope=openid+email+profile&email&response_type=token&state=#{handle}"
         end
 
       conn |> send_json(%{"url" => url})

@@ -21,6 +21,7 @@ defmodule Notary.Portal.Router do
         ^expected_key ->
           token = Notary.Portal.Token.generate_and_sign!()
           conn |> send_json(%{"token" => token})
+
         _ ->
           conn |> send_resp(422, "invalid")
       end
@@ -47,7 +48,7 @@ defmodule Notary.Portal.Router do
 
     get "/clients" do
       clients = Notary.Repo.all(Notary.Client)
-      conn |> send_json(%{ "clients" => clients })
+      conn |> send_json(%{"clients" => clients})
     end
 
     get "/clients/:id" do
