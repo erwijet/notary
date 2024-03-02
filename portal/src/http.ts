@@ -12,7 +12,10 @@ function getAuthHeaders() {
 function handleHttpResponse<T>(res: Response): Promise<T> {
   return new Promise((resolve, reject) => {
     if (res.ok) res.json().then(resolve).catch(reject);
-    else reject(res)
+    else {
+      usePortalStore.getState().clearToken();
+      reject(res)
+    }
   });
 }
 
