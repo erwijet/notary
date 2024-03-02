@@ -7,12 +7,13 @@ defmodule Notary.Client do
     field(:key, :string, null: false)
     field(:name, :string, null: false)
     field(:google_oauth_client_id, :string)
+    field(:notary_host, :string)
   end
 
   def changeset(struct, params) when is_struct(struct, __MODULE__) do
     struct
-    |> cast(params, [:key, :name, :google_oauth_client_id])
-    |> validate_required([:key, :name])
+    |> cast(params, [:key, :name, :google_oauth_client_id, :notary_host])
+    |> validate_required([:key, :name, :notary_host])
     |> unique_constraint(:key, name: :clients_key_index)
     |> unique_constraint(:name, name: :clients_name_index)
   end

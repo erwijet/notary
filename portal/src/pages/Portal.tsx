@@ -78,6 +78,11 @@ function ClientForm(props: { activeId: string | null; onClose: () => void }) {
       <TextInput label="Client Name" {...form.getInputProps("name")} />
       <TextInput label="Key" {...form.getInputProps("key")} />
 
+      <TextInput
+        label="Notary Hostname"
+        {...form.getInputProps("notary_host")}
+      />
+
       <Fieldset legend="OAuth2 Client IDs">
         <TextInput
           label="Google"
@@ -184,6 +189,7 @@ export function Portal() {
                   <Table.Tr>
                     <Table.Th>Client Name</Table.Th>
                     <Table.Th>Key</Table.Th>
+                    <Table.Th>Notary Hostname</Table.Th>
                     <Table.Th>Google ClientID</Table.Th>
                     <Table.Th align="left"></Table.Th>
                   </Table.Tr>
@@ -198,6 +204,7 @@ export function Portal() {
                           .map((_) => "•")
                           .join("")}
                       </Table.Td>
+                      <Table.Td>{each.notary_host}</Table.Td>
                       <Table.Td>
                         {each.google_oauth_client_id ?? <Pill>None</Pill>}
                       </Table.Td>

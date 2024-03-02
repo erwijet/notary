@@ -60,7 +60,6 @@ services:
       POSTGRES_PORT: 5432
 
       TOKEN_SECRET: <your_secret> # used to sign issued JWTs
-      NOTARY_HOSTNAME: <hostname> # hostname where the api is running (including the https://)
       NOTARY_PASSKEY: <passkey> # used to access the api portal
 ```
 

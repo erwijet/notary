@@ -13,8 +13,7 @@ config :notary, Notary.Repo,
 ##
 
 config :notary,
-  portal_passkey: env!("PORTAL_PASSKEY", :string!),
-  hostname: env!("NOTARY_HOSTNAME", :string!)
+  portal_passkey: env!("PORTAL_PASSKEY", :string!)
 
 ##
 
