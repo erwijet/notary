@@ -49,7 +49,7 @@ defmodule Notary.Router do
     body =
       case Notary.Token.verify_and_validate(token) do
         {:ok, claims} -> %{"valid" => true, "claims" => claims}
-        {:error, reason} -> %{"valid" => false, "reason" => reason}
+        {:error, _reason} -> %{"valid" => false }
       end
 
     conn |> send_json(body)
