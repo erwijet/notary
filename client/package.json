@@ -1,0 +1,25 @@
+{
+  "name": "@erwijet/notary",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "changeset": "changeset",
+    "build": "tsup src/index.ts --format cjs,esm --dts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7",
+    "tsup": "^8.2.3",
+    "typescript": "^5.5.4"
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@tsly/obj": "^1.4.0",
+    "zod": "^3.23.8"
+  }
+}
