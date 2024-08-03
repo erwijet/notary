@@ -7,6 +7,7 @@ defmodule Notary.Router do
   plug(:match)
 
   plug(Plug.Static, at: "/assets", from: "./portal/build/assets")
+  plug(CORSPlug)
 
   plug(:dispatch)
 

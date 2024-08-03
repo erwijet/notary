@@ -31,6 +31,7 @@ defmodule Notary.MixProject do
       {:joken, "~> 2.5"},
       {:req, "~> 0.4.9"},
       {:dotenvy, "~> 0.8.0"},
+      {:cors_plug, "~> 3.0"},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
