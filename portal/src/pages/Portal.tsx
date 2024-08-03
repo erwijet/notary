@@ -29,6 +29,7 @@ import { Footer } from "src/Footer";
 import { httpDelete, httpGet, httpPost, httpPut } from "src/http";
 import { Client, clientSchema } from "src/schema";
 import { stat } from "fs";
+import { maybe } from "@tsly/maybe";
 
 function ClientForm(props: { activeId: string | null; onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(!!props.activeId);
@@ -199,7 +200,14 @@ export function Portal() {
                           .join("")}
                       </Table.Td>
                       <Table.Td>
-                        {each.google_oauth_client_id ?? <Pill>None</Pill>}
+                        {maybe(each.google_oauth_client_id)?.take(
+                          (it) =>
+                            it
+                              .slice(0, -5)
+                              .split("")
+                              .map(() => "•")
+                              .join("") + it.slice(-5)
+                        ) ?? <Pill>None</Pill>}
                       </Table.Td>
                       <Table.Td align="right">
                         <ActionIcon

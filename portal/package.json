@@ -24,6 +24,7 @@
     "@mantine/hooks": "^7.5.3",
     "@tabler/icons-react": "^2.47.0",
     "@tanstack/react-query": "^5.21.4",
+    "@tsly/maybe": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.22.4",

@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@mantine/core':
     specifier: ^7.5.3
@@ -20,6 +16,9 @@ dependencies:
   '@tanstack/react-query':
     specifier: ^5.21.4
     version: 5.21.4(react@18.2.0)
+  '@tsly/maybe':
+    specifier: ^1.2.0
+    version: 1.2.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -733,6 +732,10 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@tsly/maybe@1.2.0:
+    resolution: {integrity: sha512-tFXYstrFh7jZj+xLrM/zzohuiVb5WUh6BaCyboMGzT88Kf1xWpc+inKMqqAsCw0kgvmzeszkEXJgCJE3RGi/4g==}
+    dev: false
+
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
     dependencies:
@@ -1394,3 +1397,7 @@ packages:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
