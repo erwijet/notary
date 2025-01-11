@@ -25,6 +25,11 @@ export const inspectionResultSchema = z.discriminatedUnion("valid", [
     z.object({ valid: z.literal(true), claims: userInfoSchema }),
 ]);
 
-export const authorizationResultSchema = z.object({
+export const authenticationResultSchema = z.object({
     url: z.string().url(),
 });
+
+export const renewResultSchema = z.discriminatedUnion("ok", [
+    z.object({ ok: z.literal(false), reason: z.string() }),
+    z.object({ ok: z.literal(true), token: z.string() }),
+]);

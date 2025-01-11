@@ -50,7 +50,7 @@ defmodule Notary.Router do
     body =
       case Notary.Token.verify_and_validate(token) do
         {:ok, claims} -> %{"valid" => true, "claims" => claims}
-        {:error, _reason} -> %{"valid" => false }
+        {:error, _reason} -> %{"valid" => false}
       end
 
     conn |> send_json(body)
@@ -83,6 +83,17 @@ defmodule Notary.Router do
 
       {:issue_token, {:error, issue}} ->
         conn |> send_resp(500, issue |> to_string())
+    end
+  end
+
+  get "/renew/:token" do
+    case Notary.Token.renew(token) do
+      {:ok, renewed} ->
+        conn |> send_json(%{"ok" => true, "token" => renewed})
+
+      {:error, [{:message, reason} | _]} ->
+        IO.inspect(reason)
+        conn |> send_json(%{"ok" => false, "reason" => reason}, code: 400)
     end
   end
 

@@ -1,10 +1,37 @@
 defmodule Notary.Token do
   use Joken.Config
 
+  # expire tokens after 5 min
+  @lifetime 5 * 60
+
   @impl true
   def token_config do
-    default_claims(skip: [:iss, :aud])
+    default_claims(skip: [:iss, :aud], default_exp: @lifetime)
     |> add_claim("iss", fn -> "Notary" end, &(&1 == "Notary"))
+  end
+
+  @spec renew(Joken.bearer_token()) ::
+          {:ok, Joken.bearer_token()} | {:error, Joken.error_reason()}
+  def renew(token) do
+    with {:ok, claims} <- Notary.Token.verify_and_validate(token),
+         {:ok, renewed, _claims} <-
+           generate_and_sign(
+             claims
+             |> Map.take([
+               "aud",
+               "via",
+               "sub",
+               "user_id",
+               "fullname",
+               "given_name",
+               "family_name",
+               "picture"
+             ])
+           ) do
+      {:ok, renewed}
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @spec issue_for_client(Notary.Client.t(), String.t(), String.t()) ::

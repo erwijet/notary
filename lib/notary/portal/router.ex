@@ -95,6 +95,31 @@ defmodule Notary.Portal.Router do
       end
     end
 
+    post "/cred" do
+      proposed = Notary.Credential.changeset(conn.body_params, %{})
+
+      if proposed.valid? do
+        case Notary.Repo.insert(proposed) do
+          {:ok, inserted} -> conn |> send_json(inserted, code: 201)
+          _ -> conn |> send_resp(409, "conflict")
+        end
+      else
+        conn |> send_resp(412, "malformed 'Credential' struct")
+      end
+    end
+
+    put "/cred/:id" do
+      with {id, _} <- Integer.parse(id),
+           base when not is_nil(base) <- Notary.Repo.get(Notary.Credentials, id) do
+        case Notary.Credentials.changeset(base, conn.body_params) |> Notary.Repo.update() do
+          {:ok, updated} -> conn |> send_json(updated)
+          _ -> conn |> send_resp(409, "conflict")
+        end
+      else
+        _ -> conn |> send_resp(404, "not found")
+      end
+    end
+
     match _ do
       conn |> send_resp(404, "not found")
     end

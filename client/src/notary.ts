@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { authorizationResultSchema, inspectionResultSchema } from "./schemas";
+import { authenticationResultSchema, inspectionResultSchema, renewResultSchema } from "./schemas";
 import { createZodHttpTransport } from "./transport";
 
 type InspectionResult = z.infer<typeof inspectionResultSchema>;
-type AuthorizeResult = z.infer<typeof authorizationResultSchema>;
+type AuthenticateResult = z.infer<typeof authenticationResultSchema>;
+type RenewResult = z.infer<typeof renewResultSchema>;
 
 export type Token = string;
 export type Provider = "google";
@@ -22,8 +23,8 @@ export type Options = {
      */
     key: string;
     /**
-     * The default callback url that the user will be navigated to upon a successful completion of the authorization flow, with a `?token=` URL parameter.
-     * This may be overridden at a per-flow basis by passing in an override when calling {@link Notary.authorize authorize( ... )}.
+     * The default callback url that the user will be navigated to upon a successful completion of the authentication flow, with a `?token=` URL parameter.
+     * This may be overridden at a per-flow basis by passing in an override when calling {@link Notary.authenticate authenticate( ... )}.
      */
     callback: string;
 };
@@ -32,11 +33,15 @@ export type Notary = {
     /**
      * Issues a new unique, temporary, once time use URL which the user can navigate to to log in with the specified provider.
      */
-    authorize: (opts: { via: Provider; callback?: string }) => Promise<AuthorizeResult>;
+    authenticate: (opts: { via: Provider; callback?: string }) => Promise<AuthenticateResult>;
     /**
      * Validates the given notary token and, if valid, returns the user data associated with it.
      */
     inspect: (token: Token) => Promise<InspectionResult>;
+    /**
+     * Reissues the given token with a fresh expiration time
+     */
+    renew: (token: Token) => Promise<RenewResult>;
 };
 
 /**
@@ -46,14 +51,17 @@ export function createNotary({ client, url, key, callback }: Options): Notary {
     const transport = createZodHttpTransport(url);
 
     return {
-        authorize({ callback: callbackOverride, via }) {
+        authenticate({ callback: callbackOverride, via }) {
             return transport.get(
                 `/authorize/${client}?via=${via}&key=${key}&callback=${callbackOverride ?? callback}`,
-                authorizationResultSchema,
+                authenticationResultSchema,
             );
         },
         inspect(token) {
             return transport.get(`/inspect/${token}`, inspectionResultSchema);
+        },
+        renew(token) {
+            return transport.get(`/renew/${token}`, renewResultSchema);
         },
     };
 }
