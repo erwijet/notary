@@ -91,6 +91,9 @@ defmodule Notary.Router do
       {:ok, renewed} ->
         conn |> send_json(%{"ok" => true, "token" => renewed})
 
+      {:error, :signature_error} ->
+        conn |> send_json(%{"ok" => false, "reason" => "invalid signatur"})
+
       {:error, [{:message, reason} | _]} ->
         IO.inspect(reason)
         conn |> send_json(%{"ok" => false, "reason" => reason}, code: 400)
