@@ -3,10 +3,12 @@ import {
   Box,
   Button,
   Container,
+  CopyButton,
   Divider,
   Fieldset,
   Group,
   Loader,
+  Menu,
   Modal,
   Paper,
   Pill,
@@ -15,10 +17,15 @@ import {
   Table,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { z } from "zod";
 import { useForm } from "@mantine/form";
 import {
+  IconBrandGoogle,
+  IconBrandGoogleFilled,
+  IconLogin,
+  IconPasswordFingerprint,
   IconPlus,
   IconTrash,
   IconUserEdit,
@@ -28,8 +35,8 @@ import { useEffect, useState } from "react";
 import { Footer } from "src/Footer";
 import { httpDelete, httpGet, httpPost, httpPut } from "src/http";
 import { Client, clientSchema } from "src/schema";
-import { stat } from "fs";
 import { maybe } from "@tsly/maybe";
+import { modals } from "@mantine/modals";
 
 function ClientForm(props: { activeId: string | null; onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(!!props.activeId);
@@ -121,6 +128,18 @@ export function Portal() {
     httpDelete("/portal/clients/" + id).then(() => loadData());
   }
 
+  function launchGoogleOAuthFlow(client: Client) {
+    httpGet(
+      `/authorize/${client.name}?via=google&key=${
+        client.key
+      }&callback=${encodeURIComponent(window.location.origin)}`
+    )
+      .then((res) => z.object({ url: z.string() }).parse(res))
+      .then(({ url }) => {
+        window.location.href = url;
+      });
+  }
+
   function loadData() {
     setIsLoading(true);
 
@@ -139,6 +158,33 @@ export function Portal() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (!!q.get("token"))
+      modals.open({
+        centered: true,
+        size: "xl",
+        title: <Title order={5}>Token</Title>,
+        onClose() {
+          window.location.search = new URLSearchParams().toString();
+        },
+        children: (
+          <Stack>
+            <Group mt="xs">
+              <TextInput disabled flex={1} value={q.get("token")!} />
+              <CopyButton value={q.get("token")!}>
+                {({ copy, copied }) => (
+                  <Button variant="default" onClick={copy}>
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                )}
+              </CopyButton>
+            </Group>
+          </Stack>
+        ),
+      });
   }, []);
 
   return (
@@ -216,6 +262,23 @@ export function Portal() {
                         >
                           <IconUserEdit size={18} />
                         </ActionIcon>
+                        <Menu>
+                          <Menu.Target>
+                            <Tooltip label="Launch Login">
+                              <ActionIcon variant="subtle">
+                                <IconPasswordFingerprint size={18} />
+                              </ActionIcon>
+                            </Tooltip>
+                          </Menu.Target>
+                          <Menu.Dropdown>
+                            <Menu.Item
+                              leftSection={<IconBrandGoogleFilled size={16} />}
+                              onClick={() => launchGoogleOAuthFlow(each)}
+                            >
+                              Launch Google OAuth Flow
+                            </Menu.Item>
+                          </Menu.Dropdown>
+                        </Menu>
                         <ActionIcon
                           variant="subtle"
                           color="red"

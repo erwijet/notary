@@ -3,21 +3,24 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
 import { MantineProvider, createTheme } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 
 import "@mantine/core/styles.css";
 
 const client = new QueryClient();
 const theme = createTheme({
   autoContrast: true,
-  primaryColor: 'indigo',
+  primaryColor: "indigo",
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <MantineProvider theme={theme}>
-      <QueryClientProvider client={client}>
-        <App />
-      </QueryClientProvider>
+      <ModalsProvider>
+        <QueryClientProvider client={client}>
+          <App />
+        </QueryClientProvider>
+      </ModalsProvider>
     </MantineProvider>
   </StrictMode>
 );
