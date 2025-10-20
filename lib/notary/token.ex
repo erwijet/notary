@@ -1,8 +1,8 @@
 defmodule Notary.Token do
   use Joken.Config
 
-  # expire tokens after 5 min
-  @lifetime 5 * 60
+  # expire tokens after 3 hours
+  @lifetime 3 * 60 * 60
 
   @impl true
   def token_config do
